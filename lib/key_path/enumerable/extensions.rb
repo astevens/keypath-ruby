@@ -3,19 +3,19 @@ module Enumerable
   def value_at_keypath(keypath)
     keypath = keypath.to_s if keypath.is_a?(KeyPath::Path)
 
-    parts = keypath.split '.', 2
+    key, remaining = keypath.split '.', 2
 
     # if it's an array, call the index
-    if self[parts[0].to_i]
-      match = self[parts[0].to_i]
+    if self.is_a?(Array)
+      match = self[key.to_i]
     else
-      match = self[parts[0]] || self[parts[0].to_sym]
+      match = self[key] || self[key.to_sym]
     end
 
-    if !parts[1] || match.nil?
+    if !remaining || match.nil?
       return match
     else
-      return match.value_at_keypath(parts[1])
+      return match.value_at_keypath(remaining)
     end
   end
 
@@ -30,25 +30,38 @@ module Enumerable
     key = keypath_parts.shift
     # Just assign value to self when it's a direct path
     # Remember, this is after calling keypath_parts#shift
-    if keypath_parts.length == 0
-      key = key.is_number? ? Integer(key) : key.to_sym
 
+    if self.is_a?(Array)
+      key = key.to_i
+    elsif self.has_key?(key.to_sym)
+      key = key.to_sym
+    end
+
+    if keypath_parts.length == 0
       self[key] = value
       return self
     end
 
     # keypath_parts.length > 0
     # Remember, this is after calling keypath_parts#shift
-    collection = if key.is_number?
-      Array.new
+    if self[key].is_a?(Array)
+      collection = self[key]
+    elsif key.is_a?(Numeric)
+      collection = Array.new
     else
-      Hash.new
+      collection = Hash.new
     end
 
     # Remember, this is after calling keypath_parts#shift
     collection.set_keypath(keypath_parts.join('.'), value)
 
     # merge the new collection into self
-    self[key] = collection
+    if self[key].is_a?(Hash)
+      self[key] = self[key].deep_merge(collection)
+    else
+      self[key] = collection
+    end
+
+    self
   end
 end
