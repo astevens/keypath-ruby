@@ -2,7 +2,7 @@ module KeyPath
   # The class representing a Path in a collection object.
   class Path
     def initialize(path = '')
-      @path = path
+      @path = path.to_s
     end
 
     def parent
@@ -21,7 +21,7 @@ module KeyPath
     end
 
     def to_a
-      @path.split('.')
+      @path.split('.')#.map {|k| k =~ /\D/ ? k : k.to_i}
     end
 
     def inspect

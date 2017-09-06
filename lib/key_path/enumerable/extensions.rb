@@ -44,23 +44,13 @@ module Enumerable
 
     # keypath_parts.length > 0
     # Remember, this is after calling keypath_parts#shift
-    if self[key].is_a?(Array)
-      collection = self[key]
-    elsif key.is_a?(Numeric)
-      collection = Array.new
-    else
-      collection = Hash.new
-    end
+    collection = self.value_at_keypath(key)
+    collection ||= keypath_parts[0] =~ /\D/ ? Hash.new : Array.new
 
     # Remember, this is after calling keypath_parts#shift
     collection.set_keypath(keypath_parts.join('.'), value)
 
-    # merge the new collection into self
-    if self[key].is_a?(Hash)
-      self[key] = self[key].deep_merge(collection)
-    else
-      self[key] = collection
-    end
+    self[key] = collection
 
     self
   end
