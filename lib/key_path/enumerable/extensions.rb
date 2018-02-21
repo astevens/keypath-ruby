@@ -45,7 +45,7 @@ module Enumerable
     # keypath_parts.length > 0
     # Remember, this is after calling keypath_parts#shift
     collection = self.value_at_keypath(key)
-    collection ||= keypath_parts[0] =~ /\D/ ? Hash.new : Array.new
+    collection ||= keypath_parts[0] =~ /^\d{1,10}$/ ? Array.new : Hash.new
 
     # Remember, this is after calling keypath_parts#shift
     collection.set_keypath(keypath_parts.join('.'), value)
