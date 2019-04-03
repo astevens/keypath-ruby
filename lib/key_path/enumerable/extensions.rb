@@ -3,7 +3,7 @@ module Enumerable
   def value_at_keypath(keypath)
     keypath = keypath.to_s if keypath.is_a?(KeyPath::Path)
 
-    key, remaining = keypath.split '.', 2
+    key, remaining = keypath.is_a?(Integer) ? keypath : keypath.split('.', 2)
 
     # if it's an array, call the index
     if self.is_a?(Array)
